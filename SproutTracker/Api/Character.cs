@@ -6,13 +6,13 @@ namespace SproutTracker;
 public class Character {
     [JsonInclude]
     [JsonPropertyName("contentId")]
-    public ulong ContentId = Services.ClientState.LocalContentId;
+    public ulong ContentId = Services.PlayerState.ContentId;
 
     [JsonInclude]
     [JsonPropertyName("name")]
-    public string Name = Services.ClientState.LocalPlayer!.Name.TextValue;
+    public string Name = Services.ObjectTable.LocalPlayer!.Name.TextValue;
 
     [JsonInclude]
     [JsonPropertyName("world")]
-    public string World = Services.ClientState.LocalPlayer.HomeWorld.Value.Name.ExtractText();
+    public string World = Services.ObjectTable.LocalPlayer.HomeWorld.Value.Name.ExtractText();
 }

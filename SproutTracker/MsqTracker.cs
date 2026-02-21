@@ -24,17 +24,17 @@ public class MsqTracker : IDisposable {
     private unsafe void Update(IFramework framework) {
         var scenarioTree = AgentScenarioTree.Instance();
         var questManager = QuestManager.Instance();
-        var cid = Services.ClientState.LocalContentId;
+        var cid = Services.PlayerState.ContentId;
         if (scenarioTree == null
             || scenarioTree->Data == null
             || questManager == null
             || cid == 0
-            || Services.ClientState.LocalPlayer == null) return;
+            || Services.ObjectTable.LocalPlayer == null) return;
 
         var oldProgression = Plugin.Configuration.QuestProgression.GetValueOrDefault(cid);
 
-        var currentQuestId = scenarioTree->Data->CurrentScenarioQuest;
-        var completeQuestId = scenarioTree->Data->CompleteScenarioQuest;
+        var currentQuestId = scenarioTree->Data->MainScenarioQuestIds[0];
+        var completeQuestId = scenarioTree->Data->MainScenarioQuestIds[3];
         var complete = oldProgression?.Quest == completeQuestId;
 
         if (complete) {
@@ -79,9 +79,10 @@ public class MsqTracker : IDisposable {
             Plugin.Configuration.QuestProgression[cid] = progression;
             Plugin.Configuration.Save();
 
+            var character = new Character();
             Task.Run(async () => {
                 await this.apiManager.SubmitProgress(new ProgressSubmit {
-                    Character = new Character(),
+                    Character = character,
                     Quest = row.RowId,
                     Sequence = progression.Sequence,
                     Complete = progression.Complete
